@@ -1,2 +1,2 @@
 # PhotoGroove
-Proyect from Elm In Action book named PhotoGroove
+"elm in action" book project named PhotoGroove
