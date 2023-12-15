@@ -9,7 +9,7 @@ urlPrefix =
 view model =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
-        , div [ id "thumbnails" ] []
+        , div [ id "thumbnails" ] (List.map viewThumbnail model)
         ]
 viewThumbnail thumb =
     img [ src (urlPrefix ++ thumb.url) ] []
