@@ -4,11 +4,16 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Browser
+import Array exposing (Array)
 
 urlPrefix : String
 urlPrefix =
     "https://picsum.photos/200/300?random="
 
+type alias Msg =
+    { description : String, data : String}
+
+view : Model -> Html Msg    
 view model =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
@@ -29,7 +34,15 @@ viewThumbnail selectedUrl thumb =
         , onClick { description = "ClickedPhoto", data = thumb.url } ]
         []
 
-initialModel : { photos : List { url : String }, selectedUrl : String }
+type alias Photo =
+    { url : String }
+
+type alias Model =
+    { photos : List Photo
+    , selectedUrl : String
+    }
+
+initialModel : Model
 initialModel =
     { photos =
         [ { url = "1" }
@@ -38,6 +51,11 @@ initialModel =
         ]
     , selectedUrl = "1"
     }
+
+photoArray : Array Photo
+photoArray = 
+    Array.fromList initialModel.photos
+
 
 update msg model =
     if msg.description == "ClickedPhoto" then
