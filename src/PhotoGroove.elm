@@ -5,8 +5,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Browser
 
+urlPrefix : String
 urlPrefix =
-    "../media/"
+    "https://picsum.photos/200/300?random="
 
 view model =
     div [ class "content" ]
@@ -27,13 +28,15 @@ viewThumbnail selectedUrl thumb =
         , classList [ ( "selected", selectedUrl == thumb.url ) ]
         , onClick { description = "ClickedPhoto", data = thumb.url } ]
         []
+
+initialModel : { photos : List { url : String }, selectedUrl : String }
 initialModel =
     { photos =
-        [ { url = "1.png" }
-        , { url = "2.png" }
-        , { url = "3.png" }
+        [ { url = "1" }
+        , { url = "2" }
+        , { url = "3" }
         ]
-    , selectedUrl = "1.png"
+    , selectedUrl = "1"
     }
 
 update msg model =
