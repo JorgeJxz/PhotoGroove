@@ -8,7 +8,7 @@ import Array exposing (Array)
 
 urlPrefix : String
 urlPrefix =
-    "https://picsum.photos/200/300?random="
+    "https://elm-in-action.com/"
 
 type alias Msg =
     { description : String, data : String}
@@ -17,8 +17,11 @@ view : Model -> Html Msg
 view model =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
+        , button
+            [ onClick { description = "ClickedSurpriseMe", data = ""} ]
+            [ text "Surprise me!"]
         , div [ id "thumbnails" ]
-            (List.map (viewThumbnail model.selectedUrl) model.photos) 
+            (List.map (viewThumbnail model.selectedUrl) model.photos)
         , img
             [ class "large"
             , src (urlPrefix ++ "large/" ++ model.selectedUrl)
@@ -26,7 +29,7 @@ view model =
             []
         ]
 
-
+viewThumbnail : String -> Photo -> Html Msg
 viewThumbnail selectedUrl thumb =
     img
         [ src (urlPrefix ++ thumb.url)
@@ -45,24 +48,27 @@ type alias Model =
 initialModel : Model
 initialModel =
     { photos =
-        [ { url = "1" }
-        , { url = "2" }
-        , { url = "3" }
+        [ { url = "1.jpeg" }
+        , { url = "2.jpeg" }
+        , { url = "3.jpeg" }
         ]
-    , selectedUrl = "1"
+    , selectedUrl = "1.jpeg"
     }
 
 photoArray : Array Photo
 photoArray = 
     Array.fromList initialModel.photos
 
-
+update : Msg -> Model -> Model
 update msg model =
-    if msg.description == "ClickedPhoto" then
-        { model | selectedUrl = msg.data }
-    else model
-
-    
+    case msg.description of
+        "ClickedPhoto" ->
+            { model | selectedUrl = msg.data }
+        "ClickedSurpriseMe" ->
+            { model | selectedUrl = "2.jpeg" }
+        _->
+            model
+        
 main =
     Browser.sandbox
         { init = initialModel
