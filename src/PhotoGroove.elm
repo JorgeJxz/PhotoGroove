@@ -13,6 +13,11 @@ urlPrefix =
 type alias Msg =
     { description : String, data : String}
 
+type ThumbnailSize 
+= Small
+| Medium
+| Large
+
 view : Model -> Html Msg    
 view model =
     div [ class "content" ]
@@ -43,6 +48,7 @@ type alias Photo =
 type alias Model =
     { photos : List Photo
     , selectedUrl : String
+    , chosenSize : ThumbnailSize
     }
 
 initialModel : Model
@@ -53,6 +59,7 @@ initialModel =
         , { url = "3.jpeg" }
         ]
     , selectedUrl = "1.jpeg"
+    , chosenSize = Medium
     }
 
 photoArray : Array Photo
