@@ -14,9 +14,9 @@ type alias Msg =
     { description : String, data : String}
 
 type ThumbnailSize 
-= Small
-| Medium
-| Large
+ = Small
+ | Medium
+ | Large
 
 view : Model -> Html Msg    
 view model =
@@ -25,7 +25,10 @@ view model =
         , button
             [ onClick { description = "ClickedSurpriseMe", data = ""} ]
             [ text "Surprise me!"]
-        , div [ id "thumbnails" ]
+        , h3 [] [ text "Thumbnail Size:" ]
+        , div [ id "choose-size" ]
+            (List.map viewSizeChooser [ Small, Medium, Large ])
+        , div [ id "thumbnails", class (sizeToString model.chosenSize) ]
             (List.map (viewThumbnail model.selectedUrl) model.photos)
         , img
             [ class "large"
@@ -41,6 +44,27 @@ viewThumbnail selectedUrl thumb =
         , classList [ ( "selected", selectedUrl == thumb.url ) ]
         , onClick { description = "ClickedPhoto", data = thumb.url } ]
         []
+
+viewSizeChooser : ThumbnailSize -> Html Msg
+viewSizeChooser size =
+    label []
+        [ input [ type_ "radio", name "size"] []
+        , text (sizeToString size)
+        ]
+
+
+-- Crear la funcion sizeToClass pag 70
+sizeToString : ThumbnailSize -> String
+sizeToString size =
+    case size of
+        Small ->
+            "small"
+        
+        Medium ->
+            "med"
+
+        Large ->
+            "large"
 
 type alias Photo =
     { url : String }
@@ -59,7 +83,7 @@ initialModel =
         , { url = "3.jpeg" }
         ]
     , selectedUrl = "1.jpeg"
-    , chosenSize = Medium
+    , chosenSize = Large
     }
 
 photoArray : Array Photo
@@ -76,6 +100,7 @@ update msg model =
         _->
             model
         
+main : Program () Model Msg
 main =
     Browser.sandbox
         { init = initialModel
