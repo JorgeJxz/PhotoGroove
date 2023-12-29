@@ -57,7 +57,7 @@ viewSizeChooser size =
         [ input [ type_ "radio", name "size", onClick (ClickedSize size)] []
         , text (sizeToString size)
         ]
--
+
 {- pag 76 (POR HACER) *****************************************************************************************
   ~ make the Medium option display as selected on page load
   ~ a broader event handler than onClick—one that detects whenever the radio state changes, even if it not from a click.
