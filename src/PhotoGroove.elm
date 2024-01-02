@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Browser
 import Array exposing (Array)
+import Random 
 
 urlPrefix : String
 urlPrefix =
@@ -12,6 +13,7 @@ urlPrefix =
 
 type Msg 
     = ClickedPhoto String
+    | GotSelectedIndex Int
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
 
@@ -115,24 +117,32 @@ getPhotoUrl index =
         Nothing ->
             ""
 
-update : Msg -> Model -> Model
+randomPhotoPicker : Random.Generator Int
+randomPhotoPicker =
+    Random.int 0 (Array.length photoArray - 1)
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        GotSelectedIndex index ->
+            ( { model | selectedUrl = getPhotoUrl index }, Cmd.none )
+
         ClickedPhoto url ->
-            { model | selectedUrl = url }
+            ( { model | selectedUrl = url }, Cmd.none )
 
         ClickedSize size ->
-            { model | chosenSize = size}
-        
-        ClickedSurpriseMe -> 
-            { model | selectedUrl = "3.jpeg" }
+            ( { model | chosenSize = size}, Cmd.none )
+       
+        ClickedSurpriseMe ->
+            ( model, Random.generate GotSelectedIndex randomPhotoPicker )
        
 main : Program () Model Msg
 main =
-    Browser.sandbox
-        { init = initialModel
+    Browser.element
+        { init = \flags -> ( initialModel, Cmd.none )
         , view = view
         , update = update
+        , subscriptions = \model -> Sub.none
         }
 
 
@@ -140,5 +150,13 @@ main =
 
     ~ "_ ->" es la rama default de los case, asi que como con un else
     nos aseguramos que pase algo siempre
+
+    ~ ver apendice B para mas info sobre el random y modulos en general
+
+    ~ (revisar) The () value is known as unit. It contains no information whatsoever. It’s both a value and a type; the () type can be satisfied only with
+        the () value. We could use it to write a function like this:
+        getUltimateAnswer : () -> Int
+        getUltimateAnswer unit =
+        40 + 2
         
 -}
