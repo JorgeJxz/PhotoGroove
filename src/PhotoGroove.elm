@@ -28,8 +28,8 @@ ademas "->" forma parte de la creacion de funciones anonimas \w h -> w * h
 -}
 view : Model -> Html Msg    
 view model =
-    div [ class "content" ]
-        (case model.status of
+    div [ class "content" ] <|
+        case model.status of
             Loaded photos selectedUrl ->
                 viewLoaded photos selectedUrl model.chosenSize
 
@@ -38,7 +38,7 @@ view model =
 
             Errored errorMessage ->
                 [ text ("Error: " ++ errorMessage)]
-        )
+        
 
 viewLoaded : List Photo -> String -> ThumbnailSize -> List (Html Msg)
 viewLoaded photos selectedUrl chosenSize =
@@ -111,42 +111,45 @@ initialModel =
     , chosenSize = Medium
     }
 
-photoArray : Array Photo
-photoArray = 
-    Array.fromList initialModel.photos
-
-{- Esta funcion trabaja con Just y Nothing, los valores que puede tener Maybe 
-type Maybe value
- = Just value
- | Nothing
- Pag 73
--}
-getPhotoUrl : Int -> String
-getPhotoUrl index =
-    case Array.get index photoArray of
-        Just photo ->
-            photo.url
-        Nothing ->
-            ""
-
-randomPhotoPicker : Random.Generator Int
-randomPhotoPicker =
-    Random.int 0 (Array.length photoArray - 1)
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotSelectedIndex index ->
-            ( { model | selectedUrl = getPhotoUrl index }, Cmd.none )
+            ( { model | status = selectUrl (getPhotoUrl index) model.status }
+            , Cmd.none 
+            )
 
         ClickedPhoto url ->
-            ( { model | selectedUrl = url }, Cmd.none )
+            ( { model | status = selectUrl url model.status }, Cmd.none )
 
         ClickedSize size ->
             ( { model | chosenSize = size}, Cmd.none )
        
         ClickedSurpriseMe ->
-            ( model, Random.generate GotSelectedIndex randomPhotoPicker )
+            case model.status of
+                Loaded (firstPhoto :: otherPhotos) _->
+                    ( model
+                    , Random.generate GotRandomPhoto
+                        (Random.uniform firstPhoto otherPhotos)
+                    )
+                
+                Loading ->
+                    ( model, Cmd.none)
+
+                Errored errorMessage ->
+                    ( model, Cmd.none)
+
+selectUrl : String -> Status -> Status
+selectUrl url status =
+    case status of
+        Loaded photos _->
+            Loaded photos url
+
+        Loading ->
+            status thought
+        
+        Errored errorMessage ->
+            status
        
 main : Program () Model Msg
 main =
@@ -172,5 +175,37 @@ main =
         40 + 2
         
     ~ Investigar  list zipper
+
+    ~<| el pana aqui lo que hace es que se pueda llamar a una funcion sin parentesis
+
+        String.toUpper (String.reverse "hello")
+                        =
+        String.toUpper <| String.reverse "hello"
+
+    ~ Esta funcion trabaja con Just y Nothing, los valores que puede tener Maybe 
+    type Maybe value
+    = Just value
+    | Nothing
+    Pag 73
+
+    getPhotoUrl : Int -> String
+    getPhotoUrl index =
+        case Array.get index photoArray of
+            Just photo ->
+                photo.url
+            Nothing ->
+                ""
+
+    randomPhotoPicker : Random.Generator Int
+    randomPhotoPicker =
+        Random.int 0 (Array.length photoArray - 1)
+
+    ~Random.uniform function!
+    Random.uniform : elem -> List elem -> Random.Generator elem
+
+    ~THE :: PATTERN
+    Loaded (firstPhoto :: otherPhotos) _ -> entiendo que sirve para separar parametros obligatorios
+    de los opcionales. INVESTIGAR
+
         
 -}
