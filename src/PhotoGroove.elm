@@ -4,7 +4,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Browser
-import Array exposing (Array)
 import Random 
 
 urlPrefix : String
@@ -13,7 +12,7 @@ urlPrefix =
 
 type Msg 
     = ClickedPhoto String
-    | GotSelectedIndex Int
+    | GotRandomPhoto Photo
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
 
@@ -114,10 +113,8 @@ initialModel =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotSelectedIndex index ->
-            ( { model | status = selectUrl (getPhotoUrl index) model.status }
-            , Cmd.none 
-            )
+        GotRandomPhoto photo ->
+            ( { model | status = selectUrl photo.url model.status}, Cmd.none)
 
         ClickedPhoto url ->
             ( { model | status = selectUrl url model.status }, Cmd.none )
@@ -132,6 +129,9 @@ update msg model =
                     , Random.generate GotRandomPhoto
                         (Random.uniform firstPhoto otherPhotos)
                     )
+                
+                Loaded [] _->
+                    ( model, Cmd.none )
                 
                 Loading ->
                     ( model, Cmd.none)
