@@ -4,7 +4,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Browser
-import Random 
+import Random
+import Http
 
 urlPrefix : String
 urlPrefix =
@@ -12,9 +13,11 @@ urlPrefix =
 
 type Msg 
     = ClickedPhoto String
-    | GotRandomPhoto Photo
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
+    | GotRandomPhoto Photo
+    | GotPhotos (Result Http.Error String)
+
 
 --Tipos personalizados, y las variantes, que son los valores que puede tener el tipo
 type ThumbnailSize 
@@ -125,10 +128,9 @@ update msg model =
         ClickedSurpriseMe ->
             case model.status of
                 Loaded (firstPhoto :: otherPhotos) _->
-                    ( model
-                    , Random.generate GotRandomPhoto
-                        (Random.uniform firstPhoto otherPhotos)
-                    )
+                    Random.uniform firstPhoto otherPhotos
+                        |> Random.generate GotRandomPhoto
+                        |> Tuple.pair model
                 
                 Loaded [] _->
                     ( model, Cmd.none )
@@ -138,6 +140,24 @@ update msg model =
 
                 Errored errorMessage ->
                     ( model, Cmd.none)
+
+        GotPhotos Result ->
+            case result of
+                Ok responseStr ->
+                    let
+                        urls =
+                            String.split "," responseStr
+                        
+                        photos = 
+                            List.map (\url -> { url = url }) urls
+
+                        firstUrl =
+                            List.head photos
+                    in
+                    ( { model | status = Loaded photos firstUrl }, Cmd.none)
+
+                Err httpError ->
+                    ( { model | status = Errored "Server error!" }, Cmd.none)
 
 selectUrl : String -> Status -> Status
 selectUrl url status =
@@ -206,6 +226,13 @@ main =
     ~THE :: PATTERN
     Loaded (firstPhoto :: otherPhotos) _ -> entiendo que sirve para separar parametros obligatorios
     de los opcionales. INVESTIGAR
+
+    ~THE [ ] PATTERN
+    Loaded [] _ ->
+        ( model, Cmd.none )
+    This pattern will match Loaded variants where the List Photo value is empty. It says
+    that if the user clicks Surprise Me! and we loaded zero photos, then the Surprise Me!
+    button does nothing. Thanks to this change, our code compiles again!
 
         
 -}
