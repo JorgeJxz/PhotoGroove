@@ -141,9 +141,7 @@ update msg model =
                 Errored errorMessage ->
                     ( model, Cmd.none)
 
-        GotPhotos result ->
-            case result of
-                Ok responseStr ->
+        GotPhotos (Ok responseStr) ->
                     case String.split "," responseStr of
                         (firstUrl :: _) as urls ->
                             let
@@ -152,8 +150,8 @@ update msg model =
                             in
                             ( { model | status = Loaded photos firstUrl }, Cmd.none)
 
-                []  ->
-                    ( { model | status = Errored "Server error!" }, Cmd.none)
+        GotPhotos (Err _) ->
+            ( model, Cmd.none)
 
 selectUrl : String -> Status -> Status
 selectUrl url status =
@@ -166,14 +164,21 @@ selectUrl url status =
         
         Errored errorMessage ->
             status
+
+initialCmd : Cmd Msg
+initialCmd =
+    Http.get
+        { url = "http://elm-in-action.com/photos/list"
+        , expect = Http.expectString GotPhotos
+        }
        
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \flags -> ( initialModel, Cmd.none )
+        { init = \_ -> ( initialModel, initialCmd )
         , view = view
         , update = update
-        , subscriptions = \model -> Sub.none
+        , subscriptions = \_ -> Sub.none
         }
 
 
