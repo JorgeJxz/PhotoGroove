@@ -6,6 +6,8 @@ import Html.Events exposing (onClick)
 import Browser
 import Random
 import Http
+import Json.Decode exposing (Decoder, int, list, string, succeed)
+import Json.Decode.Pipeline exposing (optional, required)
 
 urlPrefix : String
 urlPrefix =
@@ -95,7 +97,21 @@ sizeToString size =
             "large"
 
 type alias Photo =
-    { url : String }
+    { url : String
+    , size : Int
+    , title : String
+    }
+
+photoDecoder : Decoder Photo
+photoDecoder =
+    succeed Photo
+        |> required "url" string
+        |> required "size" int
+        |> optional "title" string "(untitled)"
+
+-- buildPhoto : String -> Int -> String -> Photo
+-- buildPhoto url size title =
+--     { url = url, size = size, title = title}
 
 type Status 
     = Loading
