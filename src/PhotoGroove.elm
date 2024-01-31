@@ -8,7 +8,7 @@ import Random
 import Http
 import Json.Encode as Encode
 import Json.Decode exposing (Decoder, int, list, string, succeed)
-import Json.Decode.Pipeline exposing (optional, required)
+import Json.Decode.Pipeline  as Pipeline exposing (optional, required)
 
 urlPrefix : String
 urlPrefix =
@@ -131,8 +131,8 @@ type alias Photo =
 photoDecoder : Decoder Photo
 photoDecoder =
     succeed Photo
-        |> Json.Decode.Pipeline.required "url" string
-        |> Json.Decode.Pipeline.required "size" int
+        |> required "url" string
+        |> required "size" int
         |> optional "title" string "(untitled)" 
 
 -- buildPhoto : String -> Int -> String -> Photo
@@ -212,7 +212,7 @@ selectUrl url status =
 initialCmd : Cmd Msg
 initialCmd =
     Http.get
-        { url = "http://elm-in-action.com/photos/list.json"
+        { url = "https://elm-in-action.com/photos/list.json"
         , expect = Http.expectJson GotPhotos (Json.Decode.list photoDecoder)
         }
        
