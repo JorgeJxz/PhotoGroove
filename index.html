@@ -2,7 +2,19 @@
 <html>
     <head>
         <link rel="stylesheet" type=text/css href="styles.css">
-    
+    </head>
+
+    <script>
+        class RangeSlider extends HTMLElement {
+            connectedCallback() {
+                var input = document.createElement("input");
+                this.appendChild(input);
+            }
+        }
+
+        window.customElements.define("range-slider", RangeSlider)
+    </script>
+
     <body>
         <div id="app"></div>
 
